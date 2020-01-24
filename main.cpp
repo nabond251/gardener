@@ -8,6 +8,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "iconfig.h"
+#include "igardener.h"
+#include "ipump.h"
+#include "itimer.h"
+
 const int PWM0_pin = 1; /* GPIO 1 as per WiringPi, GPIO18 as per BCM */
 const int PWM1_pin = 24;
 
