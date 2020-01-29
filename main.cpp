@@ -3,21 +3,27 @@
  http://www.electronicwings.com
  */
 
-#include <wiringPi.h>
-
-#include <stdio.h>
-#include <stdlib.h>
+#include "main.h"
 
 #include "iconfig.h"
 #include "igardener.h"
 #include "ipump.h"
 #include "itimer.h"
 
+using namespace std;
+
 const int PWM0_pin = 1; /* GPIO 1 as per WiringPi, GPIO18 as per BCM */
 const int PWM1_pin = 24;
 
-int main(void)
+int main(int argc, char *argv[])
 {
+  cout << argv[0]
+       << " Version "
+       << Gardener_VERSION_MAJOR
+       << "."
+       << Gardener_VERSION_MINOR
+       << endl;
+
   int intensity;
 
   if (wiringPiSetup() == -1)

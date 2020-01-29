@@ -1,0 +1,4 @@
+// The configured options and settings for Gardener
+#define Gardener_VERSION_MAJOR @Gardener_VERSION_MAJOR@
+#define Gardener_VERSION_MINOR @Gardener_VERSION_MINOR@
+
