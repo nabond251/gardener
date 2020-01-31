@@ -10,9 +10,9 @@
 namespace gardener
 {
     /**
-     * @brief Gardener sequencing timer.
+     * @brief Gardener sequencing timer interface.
      */
-    class ITimer : public IStateMachine
+    class ITimer
     {
         public:
             /**

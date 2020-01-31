@@ -7,7 +7,7 @@
 #include "config.h"
 #include "igardener.h"
 #include "ipump.h"
-#include "itimer.h"
+#include "timer.h"
 
 using namespace gardener;
 using namespace std;
@@ -33,6 +33,9 @@ int main(int argc, char *argv[])
          << endl;
 
     Config *cfg = new Config(10, 1);
+    Timer *tmr = new Timer();
+    tmr->reload(100);
+    tmr->isExpired();
 
   int intensity;
 
