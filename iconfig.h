@@ -8,7 +8,7 @@
 namespace gardener
 {
     /**
-     * @brief Gardener configuration manager.
+     * @brief Gardener configuration manager interface.
      */
     class IConfig
     {
