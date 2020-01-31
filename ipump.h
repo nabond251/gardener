@@ -1,3 +1,7 @@
+/**
+ * @brief Declares interface for gardener pump controller.
+ */
+
 #ifndef I_PUMP_H
 #define I_PUMP_H
 
@@ -5,30 +9,32 @@
 
 namespace gardener
 {
+    /**
+     * @brief Gardener pump controller.
+     */
     class IPump : public IStateMachine
     {
         public:
-            /*
-             * Request the pump to transition to the given speed.
+            /**
+             * @brief   Requests the pump to transition to the given speed.
              *
-             * newSpeed (in) - value from 0-1000 indicating percentage of
-             *                 total operating speed with resolution of 0.1%
-             *                 per count.
+             * @param   [in] newSpeed   Value from 0-1000 indicating
+             *                          percentage of total operating speed
+             *                          with resolution of 0.1% per count.
              *
-             * Does not effect an immediate transition; only requests that
-             * the transition begin.  Use isSpeedChanged to check that speed
-             * has been attained.
+             * @note    Does not effect an immediate transition; only requests
+             *          that the transition begin.  Use @ref isSpeedChanged to
+             *          check that the speed has been attained.
              */
             virtual void requestChangeSpeed(const int newSpeed) = 0;
 
-            /*
-             * Checks if the speed requested in requestChangeSpeed has been
-             * attained.
+            /**
+             * @brief   Checks if the speed requested has been attained.
              *
-             * Returns true if pump is operating at speed requested by latest
-             * call to requestChangeSpeed; or
-             * false if requestChangeSpeed has not been called or pump is
-             * changing to requested speed.
+             * @returns true if pump is operating at speed requested by latest
+             *          call to @ref requestChangeSpeed; or false if
+             *          @ref requestChangeSpeed has not been called or pump is
+             *          changing to requested speed.
              */
             virtual bool isSpeedChanged(void) = 0;
     };

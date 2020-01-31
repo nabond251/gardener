@@ -1,3 +1,7 @@
+/**
+ * @brief Declares interface for gardening sequencing timer.
+ */
+
 #ifndef I_TIMER_H
 #define I_TIMER_H
 
@@ -5,23 +9,28 @@
 
 namespace gardener
 {
+    /**
+     * @brief Gardener sequencing timer.
+     */
     class ITimer : public IStateMachine
     {
         public:
-            /*
-             * Reloads the timer.
+            /**
+             * @brief   Reloads the timer.
              *
-             * newTime (in) - new timer value to reload in seconds.
+             * @param   [in] newTime    New timer value to reload in seconds.
              *
-             * Call isExpired to check if newTime has elapsed.
+             * @note    Call @ref isExpired to check if @p newTime has
+             *          elapsed.
              */
             virtual void reload(const int newTime) = 0;
 
-            /*
-             * Checks if the timer has expired.
+            /**
+             * @brief   Checks if the timer has expired.
              *
-             * Returns true if time reloaded in reload has elapsed; or
-             * false if timer has not been loaded or time has not elapsed.
+             * @returns true if time reloaded in @ref reload has elapsed;
+             *          or false if timer has not been loaded or time has not
+             *          elapsed.
              */
             virtual bool isExpired(void) = 0;
     };

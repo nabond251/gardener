@@ -1,22 +1,31 @@
+/**
+ * @brief Declares interface for generic state machine component.
+ */
+
 #ifndef I_STATE_MACHINE_H
 #define I_STATE_MACHINE_H
 
 namespace gardener
 {
+    /**
+     * @brief Generic state machine component.
+     */
     class IStateMachine
     {
         public:
-            /*
-             * Prepare state for execution.
-             * Should always be called before execute.
-             * Should never call execute.
+            /**
+             * @brief   Prepare state for execution.
+             *
+             * @note    Should always be called before execute.
+             * @note    Should never call execute.
              */
             virtual void transition(void) = 0;
 
-            /*
-             * Execute per current state.
-             * Should always be called after transition.
-             * Should never call transition.
+            /**
+             * @brief   Execute per current state.
+             *
+             * @note    Should always be called after transition.
+             * @note    Should never call transition.
              */
             virtual void execute(void) = 0;
     };

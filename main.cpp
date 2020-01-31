@@ -1,6 +1,5 @@
-/*
- Change the Intensity of LED using PWM on Raspberry Pi
- http://www.electronicwings.com
+/**
+ * @brief Gardener main application.
  */
 
 #include "main.h"
@@ -15,6 +14,14 @@ using namespace std;
 const int PWM0_pin = 1; /* GPIO 1 as per WiringPi, GPIO18 as per BCM */
 const int PWM1_pin = 24;
 
+/**
+ * @brief   Gardener execution entry point.
+ *
+ * @param   [in] argc   CLI argument count.
+ * @param   [in] argv   CLI argument vector.
+ *
+ * @returns 0 if executed successfully, else error code.
+ */
 int main(int argc, char *argv[])
 {
   cout << argv[0]
