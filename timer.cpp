@@ -10,8 +10,8 @@ using namespace gardener;
 using namespace std;
 
 Timer::Timer(void)
+    : endTime(numeric_limits<time_t>::max())
 {
-    this->endTime = numeric_limits<time_t>::max();
 }
 
 void Timer::reload(const int newTime)

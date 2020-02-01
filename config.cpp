@@ -10,9 +10,9 @@ using namespace std;
 Config::Config(
     const int waitTime,
     const int waterTime)
+    : waitTime(waitTime)
+    , waterTime(waterTime)
 {
-    this->waitTime = waitTime;
-    this->waterTime = waterTime;
 }
 
 int Config::getWaitTime(void)

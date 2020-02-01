@@ -10,7 +10,7 @@
 namespace gardener
 {
     /**
-     * @brief Gardener pump controller.
+     * @brief Gardener pump controller interface.
      */
     class IPump : public IStateMachine
     {

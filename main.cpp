@@ -4,9 +4,12 @@
 
 #include "main.h"
 
+#include <iostream>
+#include <wiringPi.h>
+
 #include "config.h"
 #include "igardener.h"
-#include "ipump.h"
+#include "pump.h"
 #include "timer.h"
 
 using namespace gardener;
@@ -26,60 +29,102 @@ const int PWM1_pin = 24;
 int main(int argc, char *argv[])
 {
     cout << argv[0]
-         << "Version "
+         << " Version "
          << Gardener_VERSION_MAJOR
          << "."
          << Gardener_VERSION_MINOR
          << endl;
 
-    Config *cfg = new Config(10, 1);
-    Timer *tmr = new Timer();
-    tmr->reload(100);
-    tmr->isExpired();
-
-  int intensity;
-
-  if (wiringPiSetup() == -1)
-  {
-    exit(1);
-  }
-
-  pinMode(PWM0_pin, PWM_OUTPUT); /* set PWM pin as output */
-  pinMode(PWM1_pin, PWM_OUTPUT);
-
-  while (1)
-  {
-    for (intensity = 0; intensity < 1024; intensity++)
+    if (wiringPiSetup() == -1)
     {
-      pwmWrite(PWM0_pin, intensity); /* provide PWM value for duty cycle */
-      delay(1);
+        exit(1);
     }
 
-    delay(10000);
+    IConfig *cfg = new Config(10, 1);
+    ITimer *gardenerTmr = new Timer();
+    ITimer *fwdDwellTmr = new Timer();
+    ITimer *revDwellTmr = new Timer();
+    IPump *fwdPump = new Pump(PWM0_pin, *cfg, *fwdDwellTmr);
+    IPump *revPump = new Pump(PWM1_pin, *cfg, *revDwellTmr);
 
-    for (intensity = 1023; intensity >= 0; intensity--)
+    while (1)
     {
-      pwmWrite(PWM0_pin, intensity);
-      delay(1);
+        int speed;
+
+        for (speed = 0; speed <= 100; speed += 10)
+        {
+            fwdPump->requestChangeSpeed(speed);
+            while(!fwdPump->isSpeedChanged())
+            {
+                fwdPump->transition();
+                fwdPump->execute();
+                delay(100);
+            }
+
+            cout << speed << endl;
+        }
+
+        gardenerTmr->reload(1);
+        while (!gardenerTmr->isExpired())
+        {
+            delay(100);
+        }
+
+        for (speed = 100; speed >= 0; speed -= 10)
+        {
+            fwdPump->requestChangeSpeed(speed);
+            while(!fwdPump->isSpeedChanged())
+            {
+                fwdPump->transition();
+                fwdPump->execute();
+                delay(100);
+            }
+
+            cout << speed << endl;
+        }
+
+        gardenerTmr->reload(10);
+        while (!gardenerTmr->isExpired())
+        {
+            delay(100);
+        }
+
+        for (speed = 0; speed <= 100; speed += 10)
+        {
+            revPump->requestChangeSpeed(speed);
+            while(!revPump->isSpeedChanged())
+            {
+                revPump->transition();
+                revPump->execute();
+                delay(100);
+            }
+
+            cout << speed << endl;
+        }
+
+        gardenerTmr->reload(1);
+        while (!gardenerTmr->isExpired())
+        {
+            delay(100);
+        }
+
+        for (speed = 100; speed >= 0; speed -= 10)
+        {
+            revPump->requestChangeSpeed(speed);
+            while(!revPump->isSpeedChanged())
+            {
+                revPump->transition();
+                revPump->execute();
+                delay(100);
+            }
+
+            cout << speed << endl;
+        }
+
+        gardenerTmr->reload(10);
+        while (!gardenerTmr->isExpired())
+        {
+            delay(100);
+        }
     }
-
-    delay(1);
-#if 1
-    for (intensity = 0; intensity < 1024; intensity++)
-    {
-      pwmWrite(PWM1_pin, intensity); /* provide PWM value for duty cycle */
-      delay(1);
-    }
-
-    delay(10000);
-
-    for (intensity = 1023; intensity >= 0; intensity--)
-    {
-      pwmWrite(PWM1_pin, intensity);
-      delay(1);
-    }
-
-    delay(1);
-#endif
-  }
 }
