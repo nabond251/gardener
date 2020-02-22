@@ -18,7 +18,7 @@ namespace gardener
             /**
              * @brief   Reloads the timer.
              *
-             * @param   [in] newTime    New timer value to reload in seconds.
+             * @param   [in] newTime    New timer value to reload in ms.
              *
              * @note    Call @ref isExpired to check if @p newTime has
              *          elapsed.
