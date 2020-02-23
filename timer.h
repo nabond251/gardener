@@ -5,7 +5,7 @@
 #ifndef TIMER_H
 #define TIMER_H
 
-#include <ctime>
+#include <chrono>
 
 #include "itimer.h"
 
@@ -26,7 +26,7 @@ namespace gardener
             virtual bool isExpired(void);
 
         private:
-            time_t endTime;
+            std::chrono::steady_clock::time_point endTime;
     };
 }
 

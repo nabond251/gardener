@@ -4,28 +4,21 @@
 
 #include "timer.h"
 
-#include <limits>
-
 using namespace gardener;
 using namespace std;
 
 Timer::Timer(void)
-    : endTime(numeric_limits<time_t>::max())
+    : endTime(chrono::steady_clock::duration::max())
 {
 }
 
 void Timer::reload(const int newTime)
 {
-    const int msPerSec = 1000;
-    const int clocksCorrection = 200;
-    const int clocksPerMs = CLOCKS_PER_SEC / clocksCorrection / msPerSec;
-
-    int newClocks = newTime * clocksPerMs;
-    this->endTime = clock() + newClocks;
+    this->endTime = chrono::steady_clock::now() + chrono::milliseconds(newTime);
 }
 
 bool Timer::isExpired(void)
 {
-    time_t currentClock = clock();
+    chrono::steady_clock::time_point currentClock = chrono::steady_clock::now();
     return currentClock >= this->endTime;
 }
