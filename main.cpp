@@ -42,7 +42,11 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
-    IConfig *cfg = new Config(10000, 1000);
+    const int msPerDay = 24 * 60 * 60 * 1000;
+    const int waterTimeMs = 50 * 1000;
+    const int waitTimeMs = msPerDay - waterTimeMs;
+
+    IConfig *cfg = new Config(waitTimeMs, waterTimeMs);
     ITimer *gardenerTmr = new Timer();
     ITimer *dwellTmr = new Timer();
     IPump *pump = new Pump(PWM0_pin, PWM1_pin, *dwellTmr);
