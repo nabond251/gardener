@@ -18,11 +18,9 @@ const int Pump::dutyDeadband = 623;
 Pump::Pump(
     const int fwdPin,
     const int revPin,
-    IConfig &config,
     ITimer &dwellTimer)
     : fwdPin(fwdPin)
     , revPin(revPin)
-    , config(config)
     , dwellTimer(dwellTimer)
     , currentSpeed(0)
     , requestedSpeed(0)

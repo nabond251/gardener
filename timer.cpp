@@ -17,7 +17,7 @@ Timer::Timer(void)
 void Timer::reload(const int newTime)
 {
     const int msPerSec = 1000;
-    const int clocksCorrection = 4;
+    const int clocksCorrection = 200;
     const int clocksPerMs = CLOCKS_PER_SEC / clocksCorrection / msPerSec;
 
     int newClocks = newTime * clocksPerMs;

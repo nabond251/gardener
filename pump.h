@@ -5,7 +5,6 @@
 #ifndef PUMP_H
 #define PUMP_H
 
-#include "iconfig.h"
 #include "ipump.h"
 #include "itimer.h"
 
@@ -24,13 +23,11 @@ namespace gardener
                                             in forward direction.
              * @param   [in] revPin         WiringPi PWM pin to control pump
                                             in reverse direction.
-             * @param   [in,out] config     Owning gardener's configuration.
              * @param   [in,out] dwellTimer Timer for dwelling during ramp-up.
              */
             Pump(
                 const int fwdPin,
                 const int revPin,
-                IConfig &config,
                 ITimer &dwellTimer);
 
             virtual void requestChangeSpeed(const int newSpeed);
@@ -54,7 +51,6 @@ namespace gardener
 
             int fwdPin;
             int revPin;
-            IConfig &config;
             ITimer &dwellTimer;
 
             int currentSpeed;
