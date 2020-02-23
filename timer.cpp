@@ -6,8 +6,6 @@
 
 #include <limits>
 
-#define MS_PER_SEC 1000
-
 using namespace gardener;
 using namespace std;
 
@@ -18,12 +16,16 @@ Timer::Timer(void)
 
 void Timer::reload(const int newTime)
 {
-    int newClocks = (newTime * CLOCKS_PER_SEC) / MS_PER_SEC;
+    const int msPerSec = 1000;
+    const int clocksCorrection = 4;
+    const int clocksPerMs = CLOCKS_PER_SEC / clocksCorrection / msPerSec;
+
+    int newClocks = newTime * clocksPerMs;
     this->endTime = clock() + newClocks;
 }
 
 bool Timer::isExpired(void)
 {
     time_t currentClock = clock();
-    return currentClock < this->endTime;
+    return currentClock >= this->endTime;
 }

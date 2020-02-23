@@ -32,11 +32,12 @@ namespace gardener
              * @brief   Checks if the speed requested has been attained.
              *
              * @returns true if pump is operating at speed requested by latest
-             *          call to @ref requestChangeSpeed; or false if
-             *          @ref requestChangeSpeed has not been called or pump is
+             *          call to @ref requestChangeSpeed, or if @ref
+             *          requestChangeSpeed has not been called; or false if
+             *          @ref requestChangeSpeed has been called and pump is
              *          changing to requested speed.
              */
-            virtual bool isSpeedChanged(void) = 0;
+            virtual bool isSpeedSteady(void) = 0;
     };
 }
 

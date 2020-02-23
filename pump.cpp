@@ -12,21 +12,25 @@ using namespace std;
 
 const int Pump::deltaSpeed = 1;
 const int Pump::dwellTime = 1;
-const int Pump::dutyPerSpeed = 10485;
-const int Pump::dutyRes = 10;
+const int Pump::dutyScaleBits = 2;
+const int Pump::dutyDeadband = 623;
 
 Pump::Pump(
-    const int pwmPin,
+    const int fwdPin,
+    const int revPin,
     IConfig &config,
     ITimer &dwellTimer)
-    : pwmPin(pwmPin)
+    : fwdPin(fwdPin)
+    , revPin(revPin)
     , config(config)
     , dwellTimer(dwellTimer)
     , currentSpeed(0)
-    , requestedSpeed(-1)
-    , currentState(IDLE)
+    , requestedSpeed(0)
+    , currentState(STEADY)
 {
-    pinMode(this->pwmPin, PWM_OUTPUT); /* set PWM pin as output */
+    /* set PWM pins as output */
+    pinMode(this->fwdPin, PWM_OUTPUT);
+    pinMode(this->revPin, PWM_OUTPUT);
 }
 
 void Pump::requestChangeSpeed(const int newSpeed)
@@ -34,7 +38,7 @@ void Pump::requestChangeSpeed(const int newSpeed)
     this->requestedSpeed = newSpeed;
 }
 
-bool Pump::isSpeedChanged(void)
+bool Pump::isSpeedSteady(void)
 {
     return this->requestedSpeed == this->currentSpeed;
 }
@@ -43,10 +47,9 @@ void Pump::transition(void)
 {
     switch (this->currentState)
     {
-        case IDLE:
+        case STEADY:
         default:
-            if (this->requestedSpeed >= 0 &&
-                this->requestedSpeed != this->currentSpeed)
+            if (!this->isSpeedSteady())
             {
                 this->currentState = CHANGE;
             }
@@ -54,9 +57,9 @@ void Pump::transition(void)
             break;
 
         case CHANGE:
-            if (this->requestedSpeed == this->currentSpeed)
+            if (this->isSpeedSteady())
             {
-                this->currentState = IDLE;
+                this->currentState = STEADY;
             }
             else
             {
@@ -79,7 +82,7 @@ void Pump::execute(void)
 {
     switch (this->currentState)
     {
-        case IDLE:
+        case STEADY:
         case DWELL:
         default:
             break;
@@ -108,7 +111,21 @@ void Pump::execute(void)
 
 void Pump::setCurrentSpeed(const int newSpeed)
 {
-    int duty = newSpeed * dutyPerSpeed >> dutyRes;
-    pwmWrite(this->pwmPin, duty); /* provide PWM value for duty cycle */
+    int fwdDuty = 0;
+    int revDuty = 0;
+
+    if (newSpeed > 0)
+    {
+        fwdDuty = (newSpeed << dutyScaleBits) + dutyDeadband;
+    }
+    else if (newSpeed < 0)
+    {
+        revDuty = ((-newSpeed) << dutyScaleBits) + dutyDeadband;
+    }
+
+    /* provide PWM value for duty cycle */
+    pwmWrite(this->fwdPin, fwdDuty);
+    pwmWrite(this->revPin, revDuty);
+
     this->currentSpeed = newSpeed;
 }

@@ -12,6 +12,8 @@
 #include "pump.h"
 #include "timer.h"
 
+#include <ctime>
+
 using namespace gardener;
 using namespace std;
 
@@ -35,6 +37,8 @@ int main(int argc, char *argv[])
          << Gardener_VERSION_MINOR
          << endl;
 
+    cout << CLOCKS_PER_SEC << endl;
+
     if (wiringPiSetup() == -1)
     {
         exit(1);
@@ -42,10 +46,8 @@ int main(int argc, char *argv[])
 
     IConfig *cfg = new Config(10, 1);
     ITimer *gardenerTmr = new Timer();
-    ITimer *fwdDwellTmr = new Timer();
-    ITimer *revDwellTmr = new Timer();
-    IPump *fwdPump = new Pump(PWM0_pin, *cfg, *fwdDwellTmr);
-    IPump *revPump = new Pump(PWM1_pin, *cfg, *revDwellTmr);
+    ITimer *dwellTmr = new Timer();
+    IPump *pump = new Pump(PWM0_pin, PWM1_pin, *cfg, *dwellTmr);
 
     while (1)
     {
@@ -53,78 +55,78 @@ int main(int argc, char *argv[])
 
         for (speed = 0; speed <= 100; speed += 10)
         {
-            fwdPump->requestChangeSpeed(speed);
-            while(!fwdPump->isSpeedChanged())
+            pump->requestChangeSpeed(speed);
+            while(!pump->isSpeedSteady())
             {
-                fwdPump->transition();
-                fwdPump->execute();
-                delay(100);
+                pump->transition();
+                pump->execute();
+                delay(1);
             }
 
             cout << speed << endl;
         }
 
-        gardenerTmr->reload(1);
+        gardenerTmr->reload(100);
         while (!gardenerTmr->isExpired())
         {
-            delay(100);
+            delay(1);
         }
 
         for (speed = 100; speed >= 0; speed -= 10)
         {
-            fwdPump->requestChangeSpeed(speed);
-            while(!fwdPump->isSpeedChanged())
+            pump->requestChangeSpeed(speed);
+            while(!pump->isSpeedSteady())
             {
-                fwdPump->transition();
-                fwdPump->execute();
-                delay(100);
+                pump->transition();
+                pump->execute();
+                delay(1);
             }
 
             cout << speed << endl;
         }
 
-        gardenerTmr->reload(10);
+        gardenerTmr->reload(1000);
         while (!gardenerTmr->isExpired())
         {
-            delay(100);
+            delay(1);
         }
 
         for (speed = 0; speed <= 100; speed += 10)
         {
-            revPump->requestChangeSpeed(speed);
-            while(!revPump->isSpeedChanged())
+            pump->requestChangeSpeed(-speed);
+            while(!pump->isSpeedSteady())
             {
-                revPump->transition();
-                revPump->execute();
-                delay(100);
+                pump->transition();
+                pump->execute();
+                delay(1);
             }
 
             cout << speed << endl;
         }
 
-        gardenerTmr->reload(1);
+        gardenerTmr->reload(100);
         while (!gardenerTmr->isExpired())
         {
-            delay(100);
+            delay(1);
         }
 
         for (speed = 100; speed >= 0; speed -= 10)
         {
-            revPump->requestChangeSpeed(speed);
-            while(!revPump->isSpeedChanged())
+            pump->requestChangeSpeed(-speed);
+            while(!pump->isSpeedSteady())
             {
-                revPump->transition();
-                revPump->execute();
-                delay(100);
+                pump->transition();
+                pump->execute();
+                delay(1);
             }
 
             cout << speed << endl;
         }
 
-        gardenerTmr->reload(10);
+        gardenerTmr->reload(1000);
         while (!gardenerTmr->isExpired())
         {
-            delay(100);
+            delay(1);
         }
     }
 }

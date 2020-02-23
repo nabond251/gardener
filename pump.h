@@ -20,17 +20,21 @@ namespace gardener
             /**
              * @brief   Initializes a new instance of the @ref Pump class.
              *
-             * @param   [in] pwmPin         WiringPi PWM pin to control pump.
+             * @param   [in] fwdPin         WiringPi PWM pin to control pump
+                                            in forward direction.
+             * @param   [in] revPin         WiringPi PWM pin to control pump
+                                            in reverse direction.
              * @param   [in,out] config     Owning gardener's configuration.
              * @param   [in,out] dwellTimer Timer for dwelling during ramp-up.
              */
             Pump(
-                const int pwmPin,
+                const int fwdPin,
+                const int revPin,
                 IConfig &config,
                 ITimer &dwellTimer);
 
             virtual void requestChangeSpeed(const int newSpeed);
-            virtual bool isSpeedChanged(void);
+            virtual bool isSpeedSteady(void);
 
             virtual void transition(void);
             virtual void execute(void);
@@ -38,17 +42,18 @@ namespace gardener
         private:
             enum state
             {
-                IDLE,   /**< At requested speed */
+                STEADY, /**< At requested speed */
                 CHANGE, /**< Changing to requested speed */
                 DWELL,  /**< Dwelling at changed speed */
             };
 
             static const int deltaSpeed;
             static const int dwellTime;
-            static const int dutyPerSpeed;
-            static const int dutyRes;
+            static const int dutyScaleBits;
+            static const int dutyDeadband;
 
-            int pwmPin;
+            int fwdPin;
+            int revPin;
             IConfig &config;
             ITimer &dwellTimer;
 
