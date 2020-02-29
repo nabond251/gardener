@@ -1,61 +1,111 @@
-/*
- Change the Intensity of LED using PWM on Raspberry Pi
- http://www.electronicwings.com
+/**
+ * Defines gardener controller.
  */
 
-#include <wiringPi.h>
+#include "gardener.h"
 
-#include <stdio.h>
-#include <stdlib.h>
+using namespace gardener;
+using namespace std;
 
-const int PWM0_pin = 1; /* GPIO 1 as per WiringPi, GPIO18 as per BCM */
-const int PWM1_pin = 24;
+const int Gardener::waitSpeed = 0;
+const int Gardener::waterSpeed = 100;
 
-int main(void)
+Gardener::Gardener(
+    IConfig &config,
+    IPump &pump,
+    ITimer &timer)
+    : config(config)
+    , pump(pump)
+    , timer(timer)
+    , currentState(IDLE)
 {
-  int intensity;
+}
 
-  if (wiringPiSetup() == -1)
-  {
-    exit(1);
-  }
-
-  pinMode(PWM0_pin, PWM_OUTPUT); /* set PWM pin as output */
-  pinMode(PWM1_pin, PWM_OUTPUT);
-
-  while (1)
-  {
-    for (intensity = 0; intensity < 1024; intensity++)
+void Gardener::transition(void)
+{
+    switch (this->currentState)
     {
-      pwmWrite(PWM0_pin, intensity); /* provide PWM value for duty cycle */
-      delay(1);
+        case IDLE:
+        default:
+            this->currentState = START_WAIT;
+            break;
+
+        case START_WAIT:
+            this->currentState = WAIT;
+            break;
+
+        case WAIT:
+            if (this->timer.isExpired())
+            {
+                this->currentState = START_RAMP_UP;
+            }
+
+            break;
+
+        case START_RAMP_UP:
+            this->currentState = RAMP_UP;
+            break;
+
+        case RAMP_UP:
+            if (this->pump.isSpeedSteady())
+            {
+                this->currentState = START_WATER;
+            }
+
+            break;
+
+        case START_WATER:
+            this->currentState = WATER;
+            break;
+
+        case WATER:
+            if (this->timer.isExpired())
+            {
+                this->currentState = START_RAMP_DOWN;
+            }
+
+            break;
+
+        case START_RAMP_DOWN:
+            this->currentState = RAMP_DOWN;
+            break;
+
+        case RAMP_DOWN:
+            if (this->pump.isSpeedSteady())
+            {
+                this->currentState = START_WAIT;
+            }
+
+            break;
     }
+}
 
-    delay(10000);
-
-    for (intensity = 1023; intensity >= 0; intensity--)
+void Gardener::execute(void)
+{
+    switch (this->currentState)
     {
-      pwmWrite(PWM0_pin, intensity);
-      delay(1);
+        case START_WAIT:
+            this->timer.reload(this->config.getWaitTime());
+            break;
+
+        case START_RAMP_UP:
+            this->pump.requestChangeSpeed(100);
+            break;
+
+        case START_WATER:
+            this->timer.reload(this->config.getWaterTime());
+            break;
+
+        case START_RAMP_DOWN:
+            this->pump.requestChangeSpeed(0);
+            break;
+
+        case IDLE:
+        case WAIT:
+        case RAMP_UP:
+        case WATER:
+        case RAMP_DOWN:
+        default:
+            break;
     }
-
-    delay(1);
-#if 1
-    for (intensity = 0; intensity < 1024; intensity++)
-    {
-      pwmWrite(PWM1_pin, intensity); /* provide PWM value for duty cycle */
-      delay(1);
-    }
-
-    delay(10000);
-
-    for (intensity = 1023; intensity >= 0; intensity--)
-    {
-      pwmWrite(PWM1_pin, intensity);
-      delay(1);
-    }
-
-    delay(1);
-#endif
-  }
 }
